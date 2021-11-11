@@ -1,44 +1,60 @@
 package com.example;
 
-import org.junit.Before;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-
+import org.mockito.junit.MockitoJUnitRunner;
 import java.util.Arrays;
 import java.util.List;
+import static org.junit.Assert.*;
 
-import static org.junit.Assert.assertEquals;
 
+@RunWith(MockitoJUnitRunner.class)
 public class LionTest {
 
     @Mock
     private Feline feline;
 
-    @Before
-    public void init() {
-        MockitoAnnotations.initMocks(this);
+    @Test(expected = Exception.class)
+    public void lionGenderExceptionTest() throws Exception {
+        Lion lion = new Lion(" ", feline);
+        lion.doesHaveMane();
+    }
+
+    @Test(expected = AssertionError.class)
+    public void exceptionMessageErrorTest() throws AssertionError {
+        try {
+            Lion lion = new Lion(" ", feline);
+            Assert.fail("Expected AssertionError");
+        }
+        catch (Exception thrown) {
+            Assert.assertNotEquals("Используйте допустимые значения пола животного - самец или самка", thrown.getMessage());
+        }
+    }
+    @Test
+    public void lionGenderTrueTest() throws Exception {
+        Lion lion = new Lion("Самец", feline);
+        boolean expectedHasMane = true;
+        boolean actualHasMane = lion.doesHaveMane();
+        assertEquals(expectedHasMane, actualHasMane);
     }
 
     @Test
-    public void getKittensTest() throws Exception {
-        Mockito.when(feline.getKittens()).thenReturn(1);
-        Lion lion = new Lion("Самец");
-        lion.feline = feline;
-        int excepted = 1;
-        int actual = lion.getKittens();
-        assertEquals(excepted, actual);
+    public void getLionDoNotHaveKittensTest() throws Exception {
+        Lion lion = new Lion("Самец", feline);
+        int expectedGetKittens = 0;
+        int actualGetKittens = lion.getKittens();
+        assertEquals(expectedGetKittens, actualGetKittens);
     }
+
     @Test
-    public void getFoodTest() throws Exception {
-        Mockito.when(feline.getFood(Mockito.anyString())).thenReturn(Arrays.asList("Животные", "Птицы", "Рыба"));
-        Lion lion = new Lion("Самка");
-        lion.feline = feline;
-        List<String> excepted = Arrays.asList("Животные", "Птицы", "Рыба");
-        List<String> actual = lion.getFood();
-        assertEquals(excepted, actual);
+    public void getLionTypeOfFoodTest() throws Exception {
+        Lion lion = new Lion("Самец", feline);
+        Mockito.when(feline.getFood("Хищник")).thenReturn(Arrays.asList("Животные", "Птицы", "Рыба"));
+        List<String> expectedEatMeat = Arrays.asList("Животные", "Птицы", "Рыба");
+        List<String> actualEatMeat = lion.getFood();
+        assertEquals(expectedEatMeat, actualEatMeat);
     }
 }
